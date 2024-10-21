@@ -26,10 +26,18 @@ import com.bumptech.glide.Glide;
 import com.example.appbanhang.R;
 import com.example.appbanhang.adapter.LoaiSpAdapter;
 import com.example.appbanhang.model.LoaiSp;
+import com.example.appbanhang.model.LoaiSpModel;
+import com.example.appbanhang.retrofit.ApiBanHang;
+import com.example.appbanhang.retrofit.RetrofitClient;
+import com.example.appbanhang.utils.Utils;
 import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
     Toolbar toolbar;
@@ -40,17 +48,24 @@ public class MainActivity extends AppCompatActivity {
     DrawerLayout drawerLayout;
     LoaiSpAdapter loaiSpAdapter;
     List<LoaiSp> mangloaisp;
+    CompositeDisposable compositeDisposable = new CompositeDisposable();
+    ApiBanHang apiBanHang;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+        apiBanHang = RetrofitClient.getInstance(Utils.BASE_URL).create(ApiBanHang.class);
+
         Anhxa();
         ActionBar();
         ActionViewFlipper();
         if(isConnected(this)){
             Toast.makeText(getApplicationContext(), "ok", Toast.LENGTH_LONG).show();
+            ActionViewFlipper();
+            getLoaiSanPham();
         }else{
             Toast.makeText(getApplicationContext(), "khong có internet", Toast.LENGTH_LONG).show();
         }
@@ -59,6 +74,19 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+    }
+
+    private void getLoaiSanPham() {
+        compositeDisposable.add(apiBanHang.getLoaiSp()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        loaiSpModel -> {
+                            if (loaiSpModel.isSuccess()) {
+                                Toast.makeText(getApplicationContext(), loaiSpModel.getResult().get(0).getTensanpham(), Toast.LENGTH_LONG).show();
+                            }
+                        }
+                ));
     }
 
     private void ActionViewFlipper() {
