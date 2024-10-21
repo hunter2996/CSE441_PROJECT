@@ -26,10 +26,17 @@ import com.bumptech.glide.Glide;
 import com.example.appbanhang.R;
 import com.example.appbanhang.adapter.LoaiSpAdapter;
 import com.example.appbanhang.model.LoaiSp;
+import com.example.appbanhang.model.LoaiSpModel;
+import com.example.appbanhang.model.retrofit.ApiBanHang;
+import com.example.appbanhang.model.retrofit.RetrofitClient;
+import com.example.appbanhang.utils.Utils;
 import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.reactivex.rxjava3.core.Scheduler;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 
 public class MainActivity extends AppCompatActivity {
     Toolbar toolbar;
@@ -40,17 +47,23 @@ public class MainActivity extends AppCompatActivity {
     DrawerLayout drawerLayout;
     LoaiSpAdapter loaiSpAdapter;
     List<LoaiSp> mangloaisp;
+    CompositeDisposable compositeDisposable = new CompositeDisposable();
+    ApiBanHang apiBanHang;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+        apiBanHang = RetrofitClient.getInstance(Utils.BASE_URL).create(ApiBanHang.class);
+
         Anhxa();
         ActionBar();
         ActionViewFlipper();
         if(isConnected(this)){
             Toast.makeText(getApplicationContext(), "ok", Toast.LENGTH_LONG).show();
+            ActionViewFlipper();
+            getLoaiSanPham();
         }else{
             Toast.makeText(getApplicationContext(), "khong có internet", Toast.LENGTH_LONG).show();
         }
@@ -59,6 +72,19 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+    }
+
+    private void getLoaiSanPham() {
+        compositeDisposable.add(apiBanHang.getLoaiSp()
+                .subscribeOn(Scheduler.io())
+                .observeOn(AndroidSchdulers.mainThread())
+                .subscribe(
+                        LoaiSpModel -> {
+                            if(LoaiSpModel.is){
+                                Toast.makeText((getApplicationContext()), LoaiSpModel.getResult().get(0).getTensanpham(), Toast.LENGTH_LONG).show();
+                            }
+                        }
+                ));
     }
 
     private void ActionViewFlipper() {
