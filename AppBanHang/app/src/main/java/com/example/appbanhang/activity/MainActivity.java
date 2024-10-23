@@ -1,12 +1,14 @@
 package com.example.appbanhang.activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -20,23 +22,27 @@ import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.appbanhang.R;
 import com.example.appbanhang.adapter.LoaiSpAdapter;
+import com.example.appbanhang.adapter.SanPhamMoiAdapter;
 import com.example.appbanhang.model.LoaiSp;
 import com.example.appbanhang.model.LoaiSpModel;
-import com.example.appbanhang.model.retrofit.ApiBanHang;
-import com.example.appbanhang.model.retrofit.RetrofitClient;
+import com.example.appbanhang.model.SanPhamMoi;
+import com.example.appbanhang.retrofit.ApiBanHang;
+import com.example.appbanhang.retrofit.RetrofitClient;
 import com.example.appbanhang.utils.Utils;
 import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.rxjava3.core.Scheduler;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
     Toolbar toolbar;
@@ -49,6 +55,9 @@ public class MainActivity extends AppCompatActivity {
     List<LoaiSp> mangloaisp;
     CompositeDisposable compositeDisposable = new CompositeDisposable();
     ApiBanHang apiBanHang;
+    List<SanPhamMoi> mangSpMoi;
+    SanPhamMoiAdapter spAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +73,8 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "ok", Toast.LENGTH_LONG).show();
             ActionViewFlipper();
             getLoaiSanPham();
+            getSpMoi();
+            getEventClick();
         }else{
             Toast.makeText(getApplicationContext(), "khong có internet", Toast.LENGTH_LONG).show();
         }
@@ -74,14 +85,53 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void getSpMoi() {
+        compositeDisposable.add(apiBanHang.getSpMoi()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        sanPhamMoiModel -> {
+                         if(sanPhamMoiModel.isSuccess()){
+                             mangSpMoi = sanPhamMoiModel.getResult();
+                             spAdapter = new SanPhamMoiAdapter(getApplicationContext(), mangSpMoi);
+                            recyclerViewManHinhChinh.setAdapter(spAdapter);
+                         }
+
+                        },
+                        throwable -> {
+                            Toast.makeText(getApplicationContext(), "Khong ket noi duoc voi server"+throwable.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                ));
+    }
+
+    private void getEventClick() {
+        listViewManHinhChinh.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                switch (i){
+                    case 0:
+                        break;
+                    case 5:
+                        Intent quanli = new Intent(getApplicationContext(), QuanLiActivity.class);
+                        startActivity(quanli);
+                        break;
+
+                }
+            }
+        });
+    }
+
+
     private void getLoaiSanPham() {
         compositeDisposable.add(apiBanHang.getLoaiSp()
-                .subscribeOn(Scheduler.io())
-                .observeOn(AndroidSchdulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        LoaiSpModel -> {
-                            if(LoaiSpModel.is){
-                                Toast.makeText((getApplicationContext()), LoaiSpModel.getResult().get(0).getTensanpham(), Toast.LENGTH_LONG).show();
+                        loaiSpModel -> {
+                            if (loaiSpModel.isSuccess()) {
+                                mangloaisp = loaiSpModel.getResult();
+                                loaiSpAdapter = new LoaiSpAdapter(getApplicationContext(),mangloaisp);
+                                listViewManHinhChinh.setAdapter(loaiSpAdapter);
                             }
                         }
                 ));
@@ -127,12 +177,14 @@ public class MainActivity extends AppCompatActivity {
         listViewManHinhChinh = findViewById(R.id.listviewmanhinhchinh);
         navigationView = findViewById(R.id.navigationview);
         drawerLayout = findViewById(R.id.drawerlayout);
+
+        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this,2);
+        recyclerViewManHinhChinh.setLayoutManager(layoutManager);
+        recyclerViewManHinhChinh.setHasFixedSize(true);
+
         //khoi tao list
         mangloaisp = new ArrayList<>();
-        //khoi tao adapter
-        loaiSpAdapter = new LoaiSpAdapter(getApplicationContext(),mangloaisp);
-        //gan adapter cho listview
-        listViewManHinhChinh.setAdapter(loaiSpAdapter);
+        mangSpMoi = new ArrayList<>();
     }
     private boolean isConnected(Context context){
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
