@@ -42,6 +42,7 @@ public class LoaiSpAdapter extends BaseAdapter {
         ImageView imghinhanh;
     }
 
+
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         ViewHolder viewHolder;
@@ -54,9 +55,10 @@ public class LoaiSpAdapter extends BaseAdapter {
             view.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) view.getTag();
-            viewHolder.textensp.setText(array.get(i).getTensanpham());
-            Glide.with(context).load(array.get(i).getHinhanh()).into(viewHolder.imghinhanh);
+
         }
+        viewHolder.textensp.setText(array.get(i).getTensanpham());
+        Glide.with(context).load(array.get(i).getHinhanh()).into(viewHolder.imghinhanh);
         return view;
     }
 }
