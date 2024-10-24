@@ -99,6 +99,7 @@ private void getData() {
         recyclerView.setHasFixedSize(true);
         sanPhamMoiList = new ArrayList<>();
 
+
     }
 
     @Override

@@ -37,14 +37,21 @@ public class DienThoaiAdapter extends RecyclerView.Adapter<DienThoaiAdapter.MyVi
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         SanPhamMoi sanPham = array.get(position);
-
+//
         holder.tensp.setText(sanPham.getTensp());
-//        DecimalFormat decimalFormat = new DecimalFormat("###,###,###");
-//        holder.giasp.setText("Giá: " + decimalFormat.format(Double.parseDouble(sanPham.getGiasp())) + "đ");
+////        DecimalFormat decimalFormat = new DecimalFormat("###,###,###");
+////        holder.giasp.setText("Giá: " + decimalFormat.format(Double.parseDouble(sanPham.getGiasp())) + "đ");
         holder.giasp.setText(sanPham.getGiasp() + "");
-        Log.d("loggg",sanPham.getHinhanh());
+//        Log.d("loggg",sanPham.getHinhanh());
         holder.mota.setText(sanPham.getMota());
-
+        if (holder.hinhanh != null) {
+            Glide.with(context)
+                    .load(holder.hinhanh)
+                    .into(holder.hinhanh);
+        } else {
+            Log.e("Glide Error", "Image URL is null");
+        }
+//
         Glide.with(context).load(sanPham.getHinhanh()).into(holder.hinhanh);
 
 
@@ -65,7 +72,7 @@ public class DienThoaiAdapter extends RecyclerView.Adapter<DienThoaiAdapter.MyVi
             tensp = itemView.findViewById(R.id.itemdt_ten);
             giasp = itemView.findViewById(R.id.itemdt_gia);
             mota = itemView.findViewById(R.id.itemdt_mota);
-            hinhanh = itemView.findViewById(R.id.item_image);
+            hinhanh = itemView.findViewById(R.id.item_dt_image);
 
 
         }
