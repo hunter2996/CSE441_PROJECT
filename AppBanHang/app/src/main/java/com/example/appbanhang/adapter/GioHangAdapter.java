@@ -1,6 +1,8 @@
 package com.example.appbanhang.adapter;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.icu.text.DecimalFormat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +18,7 @@ import com.example.appbanhang.Interface.IImageClickListenner;
 import com.example.appbanhang.R;
 import com.example.appbanhang.model.EventBus.TinhTongEvent;
 import com.example.appbanhang.model.GioHang;
+import com.example.appbanhang.utils.Utils;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -54,19 +57,44 @@ public class GioHangAdapter extends RecyclerView.Adapter<GioHangAdapter.MyViewHo
                     if (gioHangList.get(pos).getSoluong()>1){
                         int soLuongmoi = gioHangList.get(pos).getSoluong()-1;
                         gioHangList.get(pos).setSoluong(soLuongmoi);
+
+                        holder.item_giohang_soluong.setText(gioHangList.get(pos).getSoluong() +" ");
+                        long gia = gioHangList.get(pos).getSoluong() * gioHangList.get(pos).getGiasp();
+                        holder.item_giohang_giasp2.setText(decimalFormat.format(gia));
+                        EventBus.getDefault().postSticky(new TinhTongEvent());
+
+                    }else if(gioHangList.get(pos).getSoluong()==1){
+                        AlertDialog.Builder builder = new AlertDialog.Builder(view.getRootView().getContext());
+                        builder.setTitle("Thông báo");
+                        builder.setMessage("Bạn có muốn xóa sản phẩm này khỏi giỏ hàng?");
+                        builder.setPositiveButton("Đồng ý", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        Utils.manggiohang.remove(pos);
+                                        notifyDataSetChanged();
+                                        EventBus.getDefault().postSticky(new TinhTongEvent());
+
+                                    }
+                                });
+                                builder.setNegativeButton("Hủy", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        dialogInterface.dismiss();
+                                    }
+                                });
+                        builder.show();
                     }
                 }else if(giatri == 2){
                     if (gioHangList.get(pos).getSoluong()<11){
                         int soLuongmoi = gioHangList.get(pos).getSoluong()+1;
                         gioHangList.get(pos).setSoluong(soLuongmoi);
                     }
+                    holder.item_giohang_soluong.setText(gioHangList.get(pos).getSoluong() +" ");
+                    long gia = gioHangList.get(pos).getSoluong() * gioHangList.get(pos).getGiasp();
+                    holder.item_giohang_giasp2.setText(decimalFormat.format(gia));
+                    EventBus.getDefault().postSticky(new TinhTongEvent());
 
                 }
-                holder.item_giohang_soluong.setText(gioHangList.get(pos).getSoluong() +" ");
-                long gia = gioHangList.get(pos).getSoluong() * gioHangList.get(pos).getGiasp();
-                holder.item_giohang_giasp2.setText(decimalFormat.format(gia));
-                EventBus.getDefault().postSticky(new TinhTongEvent());
-
 
             }
         });

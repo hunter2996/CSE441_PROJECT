@@ -68,7 +68,7 @@ public class ChiTietActivity extends AppCompatActivity {
         if(Utils.manggiohang.size() > 0){
             boolean flag = false;
             int soluong = Integer.parseInt(spinner.getSelectedItem().toString());
-            long giaSanPham = Long.parseLong(sanPhamMoi.getGiasp().replace(".", ""));
+            long giaSanPham = Long.parseLong(sanPhamMoi.getGiasp().replace(".", "").trim());
             for(int i = 0; i < Utils.manggiohang.size(); i++){
                 if(Utils.manggiohang.get(i).getIdsp() == sanPhamMoi.getId()){
                     Utils.manggiohang.get(i).setSoluong(soluong + Utils.manggiohang.get(i).getSoluong());
@@ -164,5 +164,17 @@ public class ChiTietActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(Utils.manggiohang != null){
+            int totalItem = 0;
+            for(int i = 0; i < Utils.manggiohang.size(); i++){
+                totalItem = totalItem + Utils.manggiohang.get(i).getSoluong();
+            }
+            badge.setText(String.valueOf(totalItem));
+        }
     }
 }
