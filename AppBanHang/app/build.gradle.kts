@@ -56,6 +56,12 @@ dependencies {
 
         // RxJava-Retrofit Adapter
         implementation("com.github.akarnokd:rxjava3-retrofit-adapter:3.0.0")
+
+        //brade
+        implementation ("com.nex3z:notification-badge:1.0.4")
+        //even bus
+        implementation ("org.greenrobot:eventbus:3.3.1")
+
     }
 
 
