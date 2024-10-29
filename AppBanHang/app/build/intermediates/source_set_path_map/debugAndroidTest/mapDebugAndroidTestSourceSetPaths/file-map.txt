@@ -1,5 +1,0 @@
-com.example.appbanhang.test.app-core-1.6.1-0 C:\Users\ADMIN\.gradle\caches\transforms-4\6830a08a238b54d0dac17148d16fdb04\transformed\core-1.6.1\res
-com.example.appbanhang.test.app-androidTest-1 D:\Code\CSE441_PROJECT-main\AppBanHang\app\build\generated\res\resValues\androidTest\debug
-com.example.appbanhang.test.app-mergeDebugAndroidTestResources-2 D:\Code\CSE441_PROJECT-main\AppBanHang\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\merged.dir
-com.example.appbanhang.test.app-mergeDebugAndroidTestResources-3 D:\Code\CSE441_PROJECT-main\AppBanHang\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\stripped.dir
-com.example.appbanhang.test.app-debugAndroidTest-4 D:\Code\CSE441_PROJECT-main\AppBanHang\app\build\intermediates\merged_res\debugAndroidTest\mergeDebugAndroidTestResources
